@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "start": "node index.js"
+    "start": "node index.js",
+    "start-local": "nodemon index.js"
   },
   "author": "Porter Haet",
   "license": "MIT",
@@ -15,6 +16,7 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "mocha": "^3.0.1",
+    "nodemon": "^1.10.0",
     "zombie": "^4.2.1"
   }
 }
