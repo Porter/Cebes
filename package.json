@@ -4,19 +4,29 @@
   "description": "Like Socrates.io, but different",
   "main": "index.js",
   "scripts": {
-    "test": "mocha",
+    "test": "NODE_ENV=test mocha",
     "start": "node index.js",
-    "start-local": "nodemon index.js"
+    "start-dev": "NODE_ENV=development nodemon index.js",
+    "start-test": "NODE_ENV=test PORT=9000 nodemon index.js",
+    "migrate": "node migrations/migration_manager.js"
   },
   "author": "Porter Haet",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.14.0"
+    "bluebird": "^3.4.1",
+    "body-parser": "^1.15.2",
+    "ejs": "^2.5.1",
+    "express": "^4.14.0",
+    "lodash": "^4.14.1",
+    "pg": "^6.0.3",
+    "request": "^2.74.0",
+    "require-optional": "^0.3.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
     "mocha": "^3.0.1",
     "nodemon": "^1.10.0",
+    "sinon": "^1.17.5",
     "zombie": "^4.2.1"
   }
 }

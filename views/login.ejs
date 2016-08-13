@@ -1,0 +1,13 @@
+<html>
+	<head></head>
+	<body>
+		<% include ./partials/header %>
+		<form method="post" action="/users/create_session">
+			<label>Username</label>
+			<input type="text" name="user[name]"><br/><br/>
+			<label>Password</label>
+			<input type="password" name="user[password]"><br/><br/>
+			<input type="submit" value="Log in"><br/><br/>
+		</form>
+	</body>
+</html>

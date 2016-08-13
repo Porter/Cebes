@@ -3,5 +3,5 @@ module.exports = {
 };
 
 function sendFile (res, file, options) {
-  res.sendFile(file, options);
+  res.render(file);
 }
