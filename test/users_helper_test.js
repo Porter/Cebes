@@ -29,7 +29,7 @@ describe('UsersHelper', () => {
 
   describe("#createUser", () => {
     it('should indicate success', done => {
-      usersHelper.createUser({name:"USERNAME"}).then(result => {
+      usersHelper.createUser({username:"USERNAME", password:"sdfa"}).then(result => {
         try {
           expect(result).to.eql({result:"success"});
           done();
@@ -42,7 +42,7 @@ describe('UsersHelper', () => {
     it("should have created a user", done => {
       usersHelper.getAll().then(result => {
         try {
-          expect(result).to.eql( [{username:"USERNAME"}] );
+          expect(result[0]).to.have.property("username", "USERNAME");
           done();
         }
         catch (e) { done(e); }
@@ -51,7 +51,7 @@ describe('UsersHelper', () => {
     });
 
     it('should return an error if username is null', done => {
-      usersHelper.createUser({name:"USERNAME"}).then(result => {
+      usersHelper.createUser({username:"USERNAME", password:"sdfa"}).then(result => {
         done(new Error("this promise was supposed to reject"));
       })
       .catch(e => {
@@ -64,9 +64,9 @@ describe('UsersHelper', () => {
   describe("#getUser", () => {
     context('when there is one user in the table', () => {
       it('return the user with the username given', done => {
-        usersHelper.getUser({name:"USERNAME"}).then(result => {
+        usersHelper.getUser({username:"USERNAME"}).then(result => {
           try {
-            expect(result).to.eql({username:"USERNAME"});
+            expect(result).to.have.property("username", "USERNAME");
             done();
           }
           catch (e) { done(e); }
@@ -75,7 +75,7 @@ describe('UsersHelper', () => {
       });
 
       it("rejects for a user that doesn't exist", done => {
-        usersHelper.getUser({name:"sdfasf"}).then(result => {
+        usersHelper.getUser({username:"sdfasf"}).then(result => {
           done(new Error("this promise was supposed to reject"));
         })
         .catch(e => {

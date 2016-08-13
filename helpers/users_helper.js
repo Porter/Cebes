@@ -1,5 +1,6 @@
 const DB = require("../helpers/db");
 const Promise = require("bluebird");
+const bcrypt = require('bcrypt');
 const UserNotFoundError = require("../errors/user_not_found_error");
 
 DB.init();
@@ -15,10 +16,25 @@ function getAll() {
 
 function getUser(user) {
   return new Promise((resolve, reject) => {
-    DB.makeQuery("SELECT * FROM users WHERE username=$1", [user.name])
+    var possibleConditions = ["username", "id"], condition, value;
+    for (var i = 0; i < possibleConditions.length; i++) {
+      var possibleCondition = possibleConditions[i];
+      if (user[possibleCondition]) {
+        condition = possibleCondition;
+        value = user[possibleCondition];
+        break;
+      }
+      console.log(user);
+      console.log(possibleCondition);
+    }
+    if (!condition) {
+      return reject(new Error("Cannot find a user " + JSON.stringify(user)));
+    }
+
+    DB.makeQuery(`SELECT * FROM users WHERE ${condition}=$1`, [value])
     .then(result => {
       if (result.rows.length == 0) {
-        return reject(new UserNotFoundError("Cannot find user with username " + user.name));
+        return reject(new UserNotFoundError("Cannot find user with " + condition + " " + value));
       }
       resolve(result.rows[0]);
     })
@@ -28,9 +44,16 @@ function getUser(user) {
 
 function createUser(user) {
   return new Promise((resolve, reject) => {
-    DB.makeQuery("INSERT INTO users (username) VALUES ($1);", [user.name])
-    .then(result => { resolve({result:"success"}); })
-    .catch(e => { reject(e); });
+    if (!user.password) {
+      return reject(new Error("missing password when creating user"));
+    }
+
+    bcrypt.hash(user.password, 5, function(err, passhash) {
+      if (err) return reject(err);
+      DB.makeQuery("INSERT INTO users (username, passhash) VALUES ($1, $2);", [user.username, passhash])
+      .then(result => { resolve({result:"success"}); })
+      .catch(e => { reject(e); });
+    });
   });
 }
 

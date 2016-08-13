@@ -25,7 +25,7 @@ describe('The database', () => {
 
   describe('data persistance', () => {
     it('inserts', done => {
-      DB.makeQuery('INSERT INTO users (username) VALUES ($1)', ['asdf']).then(result => {
+      DB.makeQuery('INSERT INTO users (username, passhash) VALUES ($1, $2)', ['asdf', 'asdf']).then(result => {
         try {
           expect(result).to.have.property("command", "INSERT");
           expect(result).to.have.property("rowCount", 1);
@@ -51,7 +51,7 @@ describe('The database', () => {
 
   describe('constraints', () => {
     it('throws an error for duplicate usernames', done => {
-      DB.makeQuery('INSERT INTO users (username) VALUES ($1)', ['asdf'])
+      DB.makeQuery('INSERT INTO users (username, passhash) VALUES ($1, $2)', ['asdf', 'asdf'])
       .then(result => {
         done(new Error("this wasn't supposed to succeed. Username is not unique"));
       })
