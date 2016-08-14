@@ -69,6 +69,7 @@ describe('User auth', () => {
           }
           browser.assert.redirected();
           browser.assert.url('/');
+          expect(browser.text()).to.contain("You are logged in as Username");
           done();
         });
     });

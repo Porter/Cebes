@@ -25,7 +25,7 @@ app.use(passport.session());
 app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
-	expressHelper.sendFile(res, "index.ejs", {root: __dirname });
+	expressHelper.sendFile(req, res, "index.ejs", {root: __dirname });
 });
 
 app.use('/users', usersHelperRouter);

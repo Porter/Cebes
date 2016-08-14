@@ -13,7 +13,12 @@ passport.serializeUser(function(user, done) {
 
 passport.deserializeUser(function(id, done) {
   usersHelper.getUser({id:id})
-  .then(user => { done(null, user); })
+  .then(user => {
+    user.getLogin = function() {
+      return this.username || this.email;
+    };
+    done(null, user);
+  })
   .catch(e => { done(e); });
 });
 

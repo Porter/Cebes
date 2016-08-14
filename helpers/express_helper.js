@@ -2,6 +2,6 @@ module.exports = {
   sendFile: sendFile
 };
 
-function sendFile (res, file, options) {
-  res.render(file);
+function sendFile(req, res, file, options) {
+  res.render(file, {req: req});
 }
