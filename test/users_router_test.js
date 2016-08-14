@@ -4,6 +4,16 @@ const usersHelper = require("../helpers/users_helper");
 
 Browser.localhost('127.0.0.1', 9000);
 
+function login(browser, callback) {
+  browser.visit('/login', err => {
+    if (err) return done(err);
+    browser
+      .fill('username',    'Username')
+      .fill('password', 'password')
+      .pressButton('Log in', callback);
+  });
+}
+
 describe('User auth', () => {
 
   const browser = new Browser();
@@ -23,7 +33,13 @@ describe('User auth', () => {
       browser
         .fill('username',    'Username')
         .fill('password', 'password')
-        .pressButton('Sign Up', done);
+        .pressButton('Sign Up', err => {
+          if (err) done(err);
+          browser.assert.redirected();
+          browser.assert.url('/');
+          expect(browser.text()).to.contain("You are logged in as Username");
+          done();
+        });
     });
 
     it("should have made a user", done => {
@@ -60,10 +76,7 @@ describe('User auth', () => {
 
 
     it("should be able to login with a username", done => {
-      browser
-        .fill('username',    'Username')
-        .fill('password', 'password')
-        .pressButton('Log in', err => {
+      login(browser, err => {
           if (err) {
             return done(err);
           }
@@ -71,7 +84,39 @@ describe('User auth', () => {
           browser.assert.url('/');
           expect(browser.text()).to.contain("You are logged in as Username");
           done();
-        });
+      });
     });
+  });
+
+  describe("Logout", () => {
+
+    it('can visit /logout', done => {
+      browser.visit('/logout', done);
+    });
+
+    it('was successful', () => {
+      browser.assert.success();
+    });
+
+    it("was redirected", () => {
+      browser.assert.redirected();
+      browser.assert.url('/');
+      browser.assert.link('a', 'Sign Up', '/signup');
+      browser.assert.link('a', 'Login', '/login');
+    });
+
+    it('can click the link to logout', (done) => {
+      login(browser, err => {
+        if (err) return done(err);
+        browser.clickLink("Log out", err => {
+          if (err) return done(err);
+          browser.assert.redirected();
+          browser.assert.url('/');
+          browser.assert.link('a', 'Sign Up', '/signup');
+          browser.assert.link('a', 'Login', '/login');
+          done();
+        });
+      });
+    })
   });
 });

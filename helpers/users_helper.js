@@ -16,6 +16,9 @@ function getAll() {
 
 function getUser(user) {
   return new Promise((resolve, reject) => {
+    if (!user) {
+      return reject(new UserNotFoundError("Cannot not find user with defintion " + user));
+    }
     var possibleConditions = ["username", "id"], condition, value;
     for (var i = 0; i < possibleConditions.length; i++) {
       var possibleCondition = possibleConditions[i];
@@ -24,8 +27,6 @@ function getUser(user) {
         value = user[possibleCondition];
         break;
       }
-      console.log(user);
-      console.log(possibleCondition);
     }
     if (!condition) {
       return reject(new Error("Cannot find a user " + JSON.stringify(user)));

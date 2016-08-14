@@ -85,7 +85,21 @@ describe('UsersHelper', () => {
             done();
           }
           catch(e) { done(e); }
-       });
+        });
+      });
+
+      it("rejects for a for undefined", done => {
+        usersHelper.getUser(undefined).then(result => {
+          done(new Error("this promise was supposed to reject"));
+        })
+        .catch(e => {
+          try {
+            expect(e).to.be.instanceof(UserNotFoundError);
+            expect(e).to.have.property("message", "Cannot not find user with defintion undefined");
+            done();
+          }
+          catch(e) { done(e); }
+        });
       });
     });
   });

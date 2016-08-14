@@ -2,52 +2,10 @@ const express = require("express");
 const bcrypt = require('bcrypt');
 const DB = require("../helpers/db");
 const usersHelper = require("../helpers/users_helper");
+const passportHelper = require("../helpers/passport_helper");
 const UserNotFoundError = require("../errors/user_not_found_error");
 
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
 
-passport.serializeUser(function(user, done) {
-  done(null, user.id);
-});
-
-passport.deserializeUser(function(id, done) {
-  usersHelper.getUser({id:id})
-  .then(user => {
-    user.getLogin = function() {
-      return this.username || this.email;
-    };
-    done(null, user);
-  })
-  .catch(e => { done(e); });
-});
-
-passport.use(new LocalStrategy(
-  function(username, password, done) {
-    usersHelper.getUser({username: username})
-    .then(user => {
-      console.log(password);
-      console.log(user.passhash);
-      bcrypt.compare(password, user.passhash, function(err, res) {
-        if (err) return done(err);
-
-        if (res) {
-          return done(null, user);
-        }
-        else {
-          return done(null, false, { message: 'Incorrect password.' });
-        }
-      });
-    })
-    .catch(e => {
-      if (e instanceof UserNotFoundError) {
-        console.log(e.message);
-        return done(null, false, { message: 'Incorrect username.' });
-      }
-      done(e);
-    });
-  }
-));
 
 DB.init();
 
@@ -59,16 +17,20 @@ usersRouter.get("/get", (req, res) => {
   .catch(e => { res.json({error:e}) } );
 });
 
-usersRouter.post("/create", (req, res) => {
+usersRouter.post("/create", (req, res, next) => {
   const username = req.body.username;
   const password = req.body.password;
   usersHelper.createUser({username: username, password: password})
-  .then(result => { res.json(result); })
+  .then(result => {
+    passportHelper.login({username:username}, { successRedirect: '/' })(req, res, next);
+  })
   .catch(e => { res.json({error:e.message}); });
 });
 
+usersRouter.use('/destroy_session', passportHelper.logout({successRedirect:'/'}));
+
 usersRouter.post("/create_session",
-  passport.authenticate('local', {
+  passportHelper.authenticate({
     successRedirect: '/',
     failureRedirect: '/login'
   }),

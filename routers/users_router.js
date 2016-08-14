@@ -7,6 +7,10 @@ usersRouter.get("/login", (req, res) => {
   expressHelper.sendFile(req, res, "login.ejs");
 });
 
+usersRouter.get("/logout", (req, res) => {
+  res.redirect("/users/destroy_session");
+});
+
 usersRouter.get("/signup", (req, res) => {
   expressHelper.sendFile(req, res, "signup.ejs");
 });
