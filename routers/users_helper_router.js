@@ -4,6 +4,7 @@ const DB = require("../helpers/db");
 const usersHelper = require("../helpers/users_helper");
 const passportHelper = require("../helpers/passport_helper");
 const UserNotFoundError = require("../errors/user_not_found_error");
+const UserValidationError = require("../errors/user_validation_error");
 
 
 
@@ -18,13 +19,17 @@ usersRouter.get("/get", (req, res) => {
 });
 
 usersRouter.post("/create", (req, res, next) => {
-  const username = req.body.username;
-  const password = req.body.password;
-  usersHelper.createUser({username: username, password: password})
+  usersHelper.createUser(req.body)
   .then(result => {
-    passportHelper.login({username:username}, { successRedirect: '/' })(req, res, next);
+    passportHelper.login({username:req.body.username}, { successRedirect: '/' })(req, res, next);
   })
-  .catch(e => { res.json({error:e.message}); });
+  .catch(e => {
+    if (!(e instanceof UserValidationError)) {
+      console.log(e.stack);
+      return res.redirect('/signup');
+    }
+    res.redirect('/signup');
+  });
 });
 
 usersRouter.use('/destroy_session', passportHelper.logout({successRedirect:'/'}));

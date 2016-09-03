@@ -1,6 +1,6 @@
 const Browser = require('zombie');
 const expect = require('chai').expect;
-const usersHelper = require("../helpers/users_helper");
+const usersHelper = require("../../helpers/users_helper");
 
 Browser.localhost('127.0.0.1', 9000);
 
@@ -28,6 +28,18 @@ describe('User auth', () => {
       browser.assert.success();
     });
 
+    it("shouldn't be able to signup with just an email");/*, done => {
+      browser
+        .fill('email',    'joeBloe@gmail.com')
+        .fill('password', 'password')
+        .pressButton('Sign Up', err => {
+          if (err) done(err);
+          browser.assert.url('/signup');
+          expect(browser.text()).to.contain("Username can't be blank");
+          done();
+        });
+    });*/
+
 
     it("should be able to signup with a username", done => {
       browser
@@ -41,6 +53,25 @@ describe('User auth', () => {
           done();
         });
     });
+
+    it('can logout and signup again', done => {
+      browser.visit('/logout', err => {
+        if (err) return done(err);
+        browser.visit("/signup", done);
+      });
+    });
+
+    it("should be able to signup with a username and an email");/*, done => {
+      browser
+        .fill('username',    'Porter')
+        .fill('email',    'pmh192@gmail.com')
+        .fill('password', 'password')
+        .pressButton('Sign Up', err => {
+          if (err) done(err);
+          expect(browser.text()).to.contain("Username can't be blank");
+          done();
+        });
+    });*/
 
     it("should have made a user", done => {
       usersHelper.getUser({username:"Username"}).then(user => {
@@ -73,7 +104,6 @@ describe('User auth', () => {
           done();
         });
     });
-
 
     it("should be able to login with a username", done => {
       login(browser, err => {

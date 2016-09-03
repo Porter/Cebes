@@ -1,6 +1,6 @@
 const expect = require('chai').expect;
-require("../env");
-const DB = require("../helpers/db");
+require("../../env");
+const DB = require("../../helpers/db");
 
 describe('The database', () => {
 

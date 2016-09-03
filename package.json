@@ -4,8 +4,8 @@
   "description": "Like Socrates.io, but different",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha",
-    "start": "node index.js",
+    "test": "NODE_ENV=test mocha ./test/*/",
+    "start": "npm run start-dev",
     "start-dev": "NODE_ENV=development nodemon index.js",
     "start-test": "NODE_ENV=test PORT=9000 nodemon index.js",
     "migrate": "node migrations/migration_manager.js"

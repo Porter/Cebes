@@ -1,8 +1,8 @@
 const expect = require('chai').expect;
 const request = require("request");
-const DB = require("../helpers/db");
-const usersHelper = require("../helpers/users_helper");
-const UserNotFoundError = require("../errors/user_not_found_error");
+const DB = require("../../helpers/db");
+const usersHelper = require("../../helpers/users_helper");
+const UserNotFoundError = require("../../errors/user_not_found_error");
 
 describe('UsersHelper', () => {
   before(done => {

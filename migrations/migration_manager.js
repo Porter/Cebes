@@ -1,3 +1,4 @@
+const Promise = require("bluebird");
 const requireOptional = require("require-optional");
 require("../env");
 const DB = require("../helpers/db");
@@ -14,16 +15,19 @@ var migration = requireOptional("./" + startAt);
 
 function doMigration(migration, number) {
   if (!migration) {
-    return;
+    return Promise.resolve();
   }
   console.log(migration.description);
-  migration.up(DB)
-    .then(result => {
-      number++;
-      doMigration(requireOptional("./" + number), number);
-      process.exit();
-    })
-    .catch(e => { throw e; process.exit(); });
+  return new Promise((resolve, reject) => {
+    migration.up(DB)
+      .then(result => {
+        number++;
+        doMigration(requireOptional("./" + number), number).then(resolve).catch(reject);
+      })
+      .catch(e => { throw e; process.exit(); });
+  });
 }
 
-doMigration(migration, startAt);
+doMigration(migration, startAt).then(r => {
+  process.exit();
+});
