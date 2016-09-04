@@ -36,10 +36,44 @@ describe('The database', () => {
         }
       });
     });
+    it('inserts 2', done => {
+      DB.insertInto('users', {username:'asdf2', passhash: 'asdf2'}).then(result => {
+        try {
+          expect(result).to.have.property("command", "INSERT");
+          expect(result).to.have.property("rowCount", 1);
+          done();
+        }
+        catch(e) {
+          done(e);
+        }
+      });
+    });
     it('retrieves', done => {
       DB.makeQuery('SELECT username from users').then(result => {
         try {
-          expect(result.rows).to.eql( [{username:'asdf'}] );
+          expect(result.rows).to.eql( [{username:'asdf'}, {username:'asdf2'}] );
+          done();
+        }
+        catch(e) {
+          done(e);
+        }
+      });
+    });
+    it('retrieves 2', done => {
+      DB.selectFrom('users', 'username').then(result => {
+        try {
+          expect(result.rows).to.eql( [{username:'asdf'}, {username:'asdf2'}] );
+          done();
+        }
+        catch(e) {
+          done(e);
+        }
+      });
+    });
+    it('retrieves 3', done => {
+      DB.selectFrom('users', ['username', 'passhash']).then(result => {
+        try {
+          expect(result.rows).to.eql( [{username:'asdf', passhash:'asdf'}, {username:'asdf2', passhash:'asdf2'}] );
           done();
         }
         catch(e) {

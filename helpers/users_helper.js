@@ -52,30 +52,16 @@ function createUser(user) {
     }
 
     const toStore = ["username", "email"];
-    var columns = [], values = [];
+    const data = {};
     toStore.forEach(column => {
-      if (user[column]) {
-        columns.push(column);
-        values.push(user[column]);
-      }
+      data[column] = user[column]
     });
-    columns.push("passhash");
-
-    var columnsString = "(" + columns.join(",") + ")";
-
-    var valuesString = "(";
-    for (var i = 1; i < columns.length+1; i++) {
-      valuesString += "$" + i;
-      if (i != columns.length) valuesString += ","
-    }
-    valuesString += ")";
-
 
     bcrypt.hash(user.password, 5, function(err, passhash) {
       if (err) return reject(err);
 
-      values.push(passhash);
-      DB.makeQuery(`INSERT INTO users ${columnsString} VALUES ${valuesString};`, values)
+      data['passhash'] = passhash;
+      DB.insertInto('users', data)
       .then(result => { resolve({result:"success"}); })
       .catch(e => { reject(e); });
     });

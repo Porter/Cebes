@@ -32,7 +32,32 @@ function makeQuery(query, params) {
         resolve(result);
       });
     });
-  })
+  });
+}
+
+function insertInto(table, data) {
+  const keys = Object.keys(data);
+  const values = keys.map(key => { return data[key]; });
+
+  const columnString = '(' + keys.join(',') + ')';
+  const valueNumbers = [];
+  for (var i = 1; i <= keys.length; i++) {
+    valueNumbers.push("$" + i);
+  }
+  const valueString = '(' + valueNumbers.join(',') + ')';
+
+  let query = `INSERT INTO ${table} ${columnString} VALUES ${valueString}`;
+  return makeQuery(query, values);
+}
+
+function selectFrom(table, values) {
+  if (typeof values == 'string') {
+    values = [values];
+  }
+  const valueString = values.join(',');
+  const query = `SELECT ${valueString} FROM ${table}`;
+  console.log(query);
+  return makeQuery(query);
 }
 
 function init(customConfig) {
@@ -57,6 +82,8 @@ function clearUsers(table) {
 
 module.exports = {
   makeQuery: makeQuery,
+  insertInto: insertInto,
+  selectFrom: selectFrom,
   clearUsers: clearUsers,
   init: init
 }
