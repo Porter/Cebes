@@ -9,6 +9,7 @@ const passport = require("passport");
 const expressHelper = require("./helpers/express_helper");
 const usersHelperRouter = require("./routers/users_helper_router");
 const usersRouter = require("./routers/users_router");
+const documentsRouter = require("./routers/documents_router");
 const DB = require("./helpers/db");
 
 
@@ -25,11 +26,12 @@ app.use(passport.session());
 app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
-	expressHelper.sendFile(req, res, "index.ejs", {root: __dirname });
+	expressHelper.sendFile(req, res, "index.ejs");
 });
 
 app.use('/users', usersHelperRouter);
 app.use('/', usersRouter);
+app.use('/documents', documentsRouter);
 
 app.listen(PORT, () => {
   console.log("listening on port", PORT);
