@@ -50,13 +50,30 @@ function insertInto(table, data) {
   return makeQuery(query, values);
 }
 
+function update(table, data, where) {
+  const keys = Object.keys(data);
+  const values = [];
+
+  const setStrings = [];
+  for (var i = 0; i < keys.length; i++) {
+    let key = keys[i];
+    let value = data[key];
+    setStrings.push(`${key}=$${i+1}`);
+    values.push(value);
+  }
+  const valueString = setStrings.join(',');
+
+  where.appendToValues(values);
+  let query = `UPDATE ${table} SET ${setStrings} ${where.toString(keys.length)}`;
+  return makeQuery(query, values);
+}
+
 function selectFrom(table, values) {
   if (typeof values == 'string') {
     values = [values];
   }
   const valueString = values.join(',');
   const query = `SELECT ${valueString} FROM ${table}`;
-  console.log(query);
   return makeQuery(query);
 }
 
@@ -80,10 +97,56 @@ function clearUsers(table) {
   return makeQuery("DELETE FROM users WHERE 1=1;");
 }
 
+class where {
+  constructor() {
+    this.conditions = [];
+  }
+
+  toString(start) {
+    if (this.conditions.length == 0) {
+      return '';
+    }
+    let strings = []
+    for (var i = 0; i < this.conditions.length; i++) {
+      let condition = this.conditions[i];
+
+      strings.push(`${condition.column}${condition.trueOperator}$${i+1+start}`)
+    }
+    return 'WHERE ' + strings.join(",")
+  }
+
+  column(column) {
+    if (this.columnValue) { throw new Error("can't call #column twice in a row"); }
+    this.columnValue = column;
+
+    return this;
+  }
+
+  equals(value) {
+    if (!this.columnValue) { throw new Error("need to call #column first"); }
+    this.conditions.push({
+      value: value,
+      column: this.columnValue,
+      trueOperator: "="
+    });
+    delete this.columnValue;
+
+    return this;
+  }
+
+  appendToValues(values) {
+    this.conditions.forEach(condition => {
+      values.push(condition.value);
+    });
+  }
+}
+
 module.exports = {
   makeQuery: makeQuery,
   insertInto: insertInto,
+  update: update,
   selectFrom: selectFrom,
   clearUsers: clearUsers,
+  where: where,
   init: init
 }

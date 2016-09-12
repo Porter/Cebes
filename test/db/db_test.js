@@ -1,6 +1,7 @@
 const expect = require('chai').expect;
 require("../../env");
 const DB = require("../../helpers/db");
+const where = DB.where;
 
 describe('The database', () => {
 
@@ -80,6 +81,23 @@ describe('The database', () => {
           done(e);
         }
       });
+    });
+    it('updates', done => {
+      const condition = new where().column('username').equals('asdf');
+      DB.update('users', {passhash: 'changed'}, condition).then(result => {
+        done();
+      }).catch(done);
+    });
+    it('retrieves 4', done => {
+      DB.selectFrom('users', ['username', 'passhash']).then(result => {
+        try {
+          expect(result.rows).to.eql( [{username:'asdf2', passhash:'asdf2'}, {username:'asdf', passhash:'changed'}] );
+          done();
+        }
+        catch(e) {
+          done(e);
+        }
+      }).catch(done);
     });
   });
 
