@@ -1,7 +1,11 @@
+const _ = require("lodash");
+
 module.exports = {
   sendFile: sendFile
 };
 
 function sendFile(req, res, file, options) {
-  res.render(file, {req: req});
+  const renderOptions = {req: req};
+  _.merge(renderOptions, options);
+  res.render(file, renderOptions);
 }
