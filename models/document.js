@@ -1,25 +1,26 @@
 const editHelper = require("../helpers/edit_helper");
-const DB = require("../helpers/db");
+const DBError = require("../errors/db_error");
+const sequelizeHelper = require("./sequelize_helper");
 const Promise = require("bluebird");
+const _ = require("lodash");
 
-class Document {
+const sequelizedConnection = sequelizeHelper.getSequelizedConnection();
+const Sequelize = sequelizeHelper.getSequelize();
 
-  constructor() {
-    this.text = '';
-    this.history = [];
+const Document = sequelizedConnection.define('documents', {
+  text: {
+    type: Sequelize.TEXT
+  },
+  history: {
+    type: Sequelize.ARRAY(Sequelize.JSON)
   }
+}, {
+  freezeTableName: true // Model tableName will be the same as the model name
+});
 
-  append(edit) {
-    this.history.push(edit);
-    this.text = editHelper.applyTextDiff(this.text, edit.diff);
-  }
 
-  // save() {
-  //   return new Promise(function(resolve, reject) {
-  //     DB.s
-  //   });
-  // }
-
+Document.init = () => {
+  return Document.sync({force: true});
 }
 
 module.exports = Document;

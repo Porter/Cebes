@@ -7,10 +7,10 @@ const bodyParser = require("body-parser");
 const session = require("express-session");
 const passport = require("passport");
 const expressHelper = require("./helpers/express_helper");
-const usersHelperRouter = require("./routers/users_helper_router");
+const User = require("./models/user");
 const usersRouter = require("./routers/users_router");
+const Document = require("./models/document");
 const documentsRouter = require("./routers/documents_router");
-const DB = require("./helpers/db");
 
 
 const PORT = process.env.PORT || 8080;
@@ -25,14 +25,24 @@ app.use(passport.session());
 
 app.set('view engine', 'ejs');
 
+app.use('/public', express.static('public'));
+
 app.get('/', (req, res) => {
 	expressHelper.sendFile(req, res, "index.ejs");
 });
 
-app.use('/users', usersHelperRouter);
-app.use('/', usersRouter);
+app.use('/users', usersRouter);
 app.use('/documents', documentsRouter);
 
-app.listen(PORT, () => {
-  console.log("listening on port", PORT);
-});
+const inits = [
+	User.init(),
+	Document.init()
+]
+
+Promise.all(inits).then(result => {
+	app.listen(PORT, () => {
+	  console.log("listening on port", PORT);
+	});
+}).catch(e => {
+	console.log(e);
+})

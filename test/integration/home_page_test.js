@@ -21,11 +21,11 @@ describe('User visits signup page', () => {
     });
 
     it('should have a link to signup', () => {
-      browser.assert.link('a', 'Sign Up', '/signup');
+      browser.assert.link('a', 'Sign Up', '/users/signup');
     });
 
     it('should have a link to login', () => {
-      browser.assert.link('a', 'Login', '/login');
+      browser.assert.link('a', 'Login', '/users/login');
     });
   });
 });

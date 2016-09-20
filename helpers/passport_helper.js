@@ -1,11 +1,8 @@
-const DB = require("../helpers/db");
 const Promise = require("bluebird");
 const bcrypt = require('bcrypt');
 const UserNotFoundError = require("../errors/user_not_found_error");
-const usersHelper = require("../helpers/users_helper");
+const User = require("../models/user");
 const _ = require("lodash");
-
-DB.init();
 
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
@@ -15,7 +12,7 @@ function serializeUser(user, done) {
 }
 
 function deserializeUser(id, done) {
-  usersHelper.getUser({id:id})
+  User.findOne({where: {id:id}})
   .then(user => {
     user.getLogin = function() {
       return this.username || this.email;
@@ -35,8 +32,11 @@ passport.deserializeUser(deserializeUser);
 
 passport.use(new LocalStrategy(
   function(username, password, done) {
-    usersHelper.getUser({username: username})
+    User.findOne({where: {username: username}})
     .then(user => {
+      if (!user) {
+        return done(null, false, { message: 'Incorrect username.' });
+      }
       bcrypt.compare(password, user.passhash, function(err, res) {
         if (err) return done(err);
 
@@ -49,10 +49,6 @@ passport.use(new LocalStrategy(
       });
     })
     .catch(e => {
-      if (e instanceof UserNotFoundError) {
-        console.log(e.message);
-        return done(null, false, { message: 'Incorrect username.' });
-      }
       done(e);
     });
   }
@@ -65,7 +61,8 @@ function authenticate(options) {
 function login(userLookup, options) {
   return function(req, res, next) {
     try {
-      usersHelper.getUser(userLookup)
+      console.log(userLookup);
+      User.findOne({where: userLookup})
       .then(result => {
         req.login(result, err => {
           if (err) { return next(err); }

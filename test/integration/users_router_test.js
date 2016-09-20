@@ -1,12 +1,12 @@
 const Browser = require('zombie');
 const expect = require('chai').expect;
-const usersHelper = require("../../helpers/users_helper");
+const User = require("../../models/user");
 
 Browser.localhost('127.0.0.1', 9000);
 
 function login(browser, callback) {
-  browser.visit('/login', err => {
-    if (err) return done(err);
+  browser.visit('/users/login', err => {
+    if (err) return callback(err);
     browser
       .fill('username',    'Username')
       .fill('password', 'password')
@@ -18,10 +18,18 @@ describe('User auth', () => {
 
   const browser = new Browser();
 
+  before(done => {
+    User.init().then(result => {
+      User.destroy({where: {}}).then(removedCount => {
+        done();
+      })
+    });
+  });
+
   describe("Signup", () => {
 
-    it('can visit /signup', done => {
-      browser.visit('/signup', done);
+    it('can visit /users/signup', done => {
+      browser.visit('/users/signup', done);
     });
 
     it('was successful', () => {
@@ -40,24 +48,39 @@ describe('User auth', () => {
         });
     });*/
 
+    it("should start with zero users", done => {
+      User.findAll({}).then(users => {
+        try {
+          expect(users).to.have.property('length', 0);
+          done();
+        }
+        catch (e) { done(e); }
+      })
+    })
 
     it("should be able to signup with a username", done => {
-      browser
-        .fill('username',    'Username')
-        .fill('password', 'password')
-        .pressButton('Sign Up', err => {
-          if (err) done(err);
-          browser.assert.redirected();
-          browser.assert.url('/');
-          expect(browser.text()).to.contain("You are logged in as Username");
-          done();
-        });
+      try {
+        browser
+          .fill('username',    'Username')
+          .fill('password', 'password')
+          .pressButton('Sign Up', err => {
+            if (err) done(err);
+            try {
+              browser.assert.redirected();
+              browser.assert.url('/');
+              expect(browser.text()).to.contain("You are logged in as Username");
+            }
+            catch(e) { return done(e); }
+            done();
+          });
+        }
+        catch(e) { done(e); }
     });
 
     it('can logout and signup again', done => {
-      browser.visit('/logout', err => {
+      browser.visit('/users/logout', err => {
         if (err) return done(err);
-        browser.visit("/signup", done);
+        browser.visit("/users/signup", done);
       });
     });
 
@@ -74,7 +97,7 @@ describe('User auth', () => {
     });*/
 
     it("should have made a user", done => {
-      usersHelper.getUser({username:"Username"}).then(user => {
+      User.findOne({where: {username:"Username"}}).then(user => {
         done();
       })
       .catch(e => { done(e); });
@@ -83,15 +106,15 @@ describe('User auth', () => {
 
   describe("Login", () => {
 
-    it('can visit /login', done => {
-      browser.visit('/login', done);
+    it('can visit /users/login', done => {
+      browser.visit('/users/login', done);
     });
 
     it('was successful', () => {
       browser.assert.success();
     });
 
-    it("redirect to /login for bad credentials", done => {
+    it("redirect to /users/login for bad credentials", done => {
       browser
         .fill('username',    'Username')
         .fill('password', 'safsadfewafdsf')
@@ -100,7 +123,7 @@ describe('User auth', () => {
             return done(err);
           }
           browser.assert.redirected();
-          browser.assert.url('/login');
+          browser.assert.url('/users/login');
           done();
         });
     });
@@ -120,20 +143,23 @@ describe('User auth', () => {
 
   describe("Logout", () => {
 
-    it('can visit /logout', done => {
-      browser.visit('/logout', done);
+    it('can visit /users/logout', done => {
+      browser.visit('/users/logout', done);
     });
 
     it('was successful', () => {
       browser.assert.success();
     });
 
-    it("was redirected", () => {
+    it("was redirected to /", () => {
       browser.assert.redirected();
       browser.assert.url('/');
-      browser.assert.link('a', 'Sign Up', '/signup');
-      browser.assert.link('a', 'Login', '/login');
     });
+
+    it("has the right links", () => {
+      browser.assert.link('a', 'Sign Up', '/users/signup');
+      browser.assert.link('a', 'Login', '/users/login');
+    })
 
     it('can click the link to logout', (done) => {
       login(browser, err => {
@@ -142,8 +168,8 @@ describe('User auth', () => {
           if (err) return done(err);
           browser.assert.redirected();
           browser.assert.url('/');
-          browser.assert.link('a', 'Sign Up', '/signup');
-          browser.assert.link('a', 'Login', '/login');
+          browser.assert.link('a', 'Sign Up', '/users/signup');
+          browser.assert.link('a', 'Login', '/users/login');
           done();
         });
       });
