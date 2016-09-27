@@ -14,7 +14,7 @@ function login(browser, callback) {
   });
 }
 
-describe('User auth', () => {
+describe('User auth @integration', () => {
 
   const browser = new Browser();
 

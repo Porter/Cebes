@@ -7,11 +7,12 @@ describe("Document", () => {
       done();
     }).catch(done);
   })
-  describe('#newEmptyDocument', () => {
+  describe('#create', () => {
     it("loads the properties", (done) => {
       Document.create({}).then(doc => {
         expect(doc).to.have.property('text');
         expect(doc).to.have.property('history');
+        expect(doc).to.have.property('id');
         done();
       });
     });

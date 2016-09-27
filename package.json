@@ -4,7 +4,9 @@
   "description": "Like Socrates.io, but different",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha ./test/*/",
+    "test": "NODE_ENV=test mocha ./test/*/ --grep integration --invert",
+    "test-int": "NODE_ENV=test mocha ./test/*/ --grep integration --timeout 10000",
+    "test-all": "npm run test && npm run test-int",
     "start": "npm run start-dev",
     "start-dev": "NODE_ENV=development nodemon index.js",
     "start-test": "NODE_ENV=test PORT=9000 nodemon index.js",
@@ -32,6 +34,7 @@
     "chai": "^3.5.0",
     "mocha": "^3.0.1",
     "nodemon": "^1.10.0",
+    "phantomjs": "^2.1.7",
     "sinon": "^1.17.5",
     "zombie": "^4.2.1"
   }

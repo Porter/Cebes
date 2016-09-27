@@ -3,7 +3,7 @@ const expect = require('chai').expect;
 
 Browser.localhost('127.0.0.1', 9000);
 
-describe('User visits signup page', () => {
+describe('User visits signup page @integration', () => {
 
   const browser = new Browser();
 
