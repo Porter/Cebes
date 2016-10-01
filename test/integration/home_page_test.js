@@ -1,31 +1,21 @@
-const Browser = require('zombie');
 const expect = require('chai').expect;
+const testHelper = require("./test_helper");
 
-Browser.localhost('127.0.0.1', 9000);
+const folder = "home";
 
 describe('User visits signup page @integration', () => {
 
-  const browser = new Browser();
-
-  before(done => {
-    browser.visit('/', done);
-  });
-
-  it('should be successful', () => {
-    browser.assert.success();
+  it('should be successful', done => {
+    testHelper.run(folder, "visit_status").then(done).catch(done);;
   });
 
   describe('home page content', () => {
-    it('should have hello world', () => {
-      expect(browser.text()).to.contain("Hello world");
+    it('should have hello world', done => {
+      testHelper.run(folder, "has_hello_world").then(done).catch(done);;
     });
 
-    it('should have a link to signup', () => {
-      browser.assert.link('a', 'Sign Up', '/users/signup');
-    });
-
-    it('should have a link to login', () => {
-      browser.assert.link('a', 'Login', '/users/login');
+    it('should have a link to signup and login', done => {
+      testHelper.run(folder, "links").then(done).catch(done);;
     });
   });
 });

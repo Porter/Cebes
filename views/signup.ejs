@@ -1,15 +1,17 @@
 <html>
-	<head></head>
+	<head>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	</head>
 	<body>
 		<% include ./partials/header %>
 		<form method="post" action="/users/create">
 			<label>Username</label><br/>
-			<input type="text" name="username"><br/><br/>
+			<input id="usernameInput" type="text" name="username"><br/><br/>
 			<label>Email</label><br/>
-			<input type="email" name="email"><br/><br/>
+			<input id="emailInput" type="email" name="email"><br/><br/>
 			<label>Password</label><br/>
-			<input type="password" name="password"><br/><br/>
-			<input type="submit" value="Sign Up"><br/><br/>
+			<input id="passwordInput" type="password" name="password"><br/><br/>
+			<input id="signUpButton" type="submit" value="Sign Up"><br/><br/>
 		</form>
 	</body>
 </html>

@@ -1,6 +1,6 @@
 var page = require('webpage').create();
 const expect = require('chai').expect;
-page.open('http://127.0.0.1:9000/documents', function(status) {
+page.open('http://127.0.0.1:9000/', function(status) {
   var links = page.evaluate(function() {
       var links =  $('a'), r = [];
       for (var i = 0; i < links.length; i++) {

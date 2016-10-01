@@ -1,5 +1,6 @@
 var page = require('webpage').create();
+var expect = require("chai").expect;
 page.open('http://127.0.0.1:9000/documents', function(status) {
-  console.log(page.plainText);
+  expect(page.plainText).to.contain("New");
   phantom.exit();
 });
