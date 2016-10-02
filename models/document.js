@@ -9,7 +9,8 @@ const Sequelize = sequelizeHelper.getSequelize();
 
 const Document = sequelizedConnection.define('documents', {
   text: {
-    type: Sequelize.TEXT
+    type: Sequelize.TEXT,
+    defaultValue: ""
   },
   history: {
     type: Sequelize.ARRAY(Sequelize.JSON)
@@ -20,7 +21,7 @@ const Document = sequelizedConnection.define('documents', {
 
 
 Document.init = () => {
-  return Document.sync({force: true});
+  return Document.sync();
 }
 
 module.exports = Document;

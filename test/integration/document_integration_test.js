@@ -5,6 +5,19 @@ const Document = require("../../models/document")
 
 const folder = "documents";
 
+function waitForIt(fn, times) {
+  return new Promise(function(resolve, reject) {
+    fn().then(resolve).catch(e => {
+      if (times <= 1) {
+        return reject(e);
+      }
+      setTimeout(function() {
+        waitForIt(fn, times-1).then(resolve).catch(reject);
+      }, 100);
+    });
+  });
+}
+
 describe('User visits signup page @integration', () => {
 
   it('should be successful', done => {
@@ -30,7 +43,7 @@ describe('User visits signup page @integration', () => {
   describe("edit view", () => {
 
     before(done => {
-      Document.init().then(removedCount => {
+      Document.sync({force: true}).then(removedCount => {
         testHelper.run(folder, "edit_view").then(done).catch(done);
       }).catch(done);
     });
@@ -46,14 +59,18 @@ describe('User visits signup page @integration', () => {
     it("should have a changable div with the id 'rootDiv'", () => {
     });
 
-    it("should update the document in the db'");/*, done => {
-      Document.findOne({where:{id:1}}).then(doc => {
-        try {
-          expect(doc.text).to.eql('abc');
-          done();
-        }
-        catch (e) { done(e); }
-      }).catch(done);
-    });*/
+    it("should update the document in the db'", done => {
+      waitForIt(() => {
+        return new Promise(function(resolve, reject) {
+          Document.findOne({where:{id:1}}).then(doc => {
+            try {
+              expect(doc.text).to.eql('abc');
+              resolve();
+            }
+            catch (e) { reject(e); }
+          }).catch(done);
+        });
+      }, 10).then(done).catch(done);
+    });
   });
 });

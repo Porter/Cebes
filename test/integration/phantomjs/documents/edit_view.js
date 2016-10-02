@@ -62,10 +62,15 @@ function editRootDiv() {
       var html = page.evaluate(function() {
         return $("#rootDiv").html();
       });
+      var upToDate = page.evaluate(function() {
+        return frontEnd.isUpToDate();
+      });
       expect(html).to.contain("abc");
+      expect(upToDate).to.eql(true);
     }, 10).then(resolve).catch(reject);
   });
 }
+
 
 visitEditPage()
 .then(editRootDiv)

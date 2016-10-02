@@ -3,15 +3,19 @@ requireOptional("./env");
 
 const express = require('express');
 const app = express();
+const http = require('http').Server(app);
 const bodyParser = require("body-parser");
 const session = require("express-session");
 const passport = require("passport");
 const expressHelper = require("./helpers/express_helper");
+const socketIOHandler = require("./helpers/socket_io_handler");
 const User = require("./models/user");
 const usersRouter = require("./routers/users_router");
 const Document = require("./models/document");
 const documentsRouter = require("./routers/documents_router");
+const io = require('socket.io')(http);
 
+socketIOHandler.handle(io);
 
 const PORT = process.env.PORT || 8080;
 
@@ -40,7 +44,7 @@ const inits = [
 ]
 
 Promise.all(inits).then(result => {
-	app.listen(PORT, () => {
+	http.listen(PORT, () => {
 	  console.log("listening on port", PORT);
 	});
 }).catch(e => {
