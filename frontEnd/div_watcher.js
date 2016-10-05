@@ -1,11 +1,20 @@
 const editHelper = require('../helpers/edit_helper');
 
-let text, lastSentText;
-
-let div;
+let text, lastSentText, div, inited = false;
 
 function getDivText() {
   return div.textContent;
+}
+
+function setDivText(text) {
+  div.innerHTML = text;
+}
+
+function init(doc) {
+  div = document.getElementById("rootDiv");
+  setDivText(doc.text);
+  text = lastSentText = doc.text;
+  inited = true;
 }
 
 function check(div, eventEmmitter) {
@@ -23,7 +32,6 @@ function check(div, eventEmmitter) {
 }
 
 function watch(eventEmmitter) {
-  div = document.getElementById("rootDiv");
   text = lastSentText = getDivText();
   check(div, eventEmmitter);
 }
@@ -32,7 +40,13 @@ function isUpToDate() {
   return getDivText() == lastSentText;
 }
 
+function isInited() {
+  return inited;
+}
+
 module.exports = {
   watch: watch,
+  init: init,
+  isInited: isInited,
   isUpToDate: isUpToDate
 };

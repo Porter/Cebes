@@ -59,7 +59,10 @@ describe('User visits signup page @integration', () => {
     it("should have a changable div with the id 'rootDiv'", () => {
     });
 
-    it("should update the document in the db'", done => {
+    it("should have the changes even after a refresh", () => {
+    });
+
+    it("should update the document in the db", done => {
       waitForIt(() => {
         return new Promise(function(resolve, reject) {
           Document.findOne({where:{id:1}}).then(doc => {

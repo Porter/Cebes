@@ -2,6 +2,15 @@ var page = require('webpage').create();
 var expect = require("chai").expect;
 var Promise = require("bluebird");
 
+function waitForInitiation() {
+  return waitForIt(function () {
+    var inited = page.evaluate(function() {
+      return frontEnd.isInited();
+    });
+    expect(inited).to.eql(true);
+  });
+}
+
 function waitForIt(fn, times) {
   return new Promise(function(resolve, reject) {
     try {
@@ -48,32 +57,56 @@ function visitEditPage() {
 
 function editRootDiv() {
   return new Promise(function(resolve, reject) {
-    page.evaluate(function() {
-      $("#rootDiv").focus();
-    });
+    waitForInitiation().then(function(r) {
+      page.evaluate(function() {
+        $("#rootDiv").focus();
+      });
 
-    page.sendEvent('keypress', 'abc');
-
-    var html = page.evaluate(function() {
-      return $("#rootDiv").html();
-    });
-
-    waitForIt(function () {
       var html = page.evaluate(function() {
         return $("#rootDiv").html();
       });
-      var upToDate = page.evaluate(function() {
-        return frontEnd.isUpToDate();
+      expect(html).to.eql('');
+
+      page.sendEvent('keypress', 'abc');
+
+      waitForIt(function () {
+        var html = page.evaluate(function() {
+          return $("#rootDiv").html();
+        });
+        var upToDate = page.evaluate(function() {
+          return frontEnd.isUpToDate();
+        });
+        expect(html).to.contain("abc");
+        expect(upToDate).to.eql(true);
+      }, 10).then(resolve).catch(reject);
+    }).catch(reject);
+  });
+}
+
+function refresh() {
+  return new Promise(function(resolve, reject) {
+    // page.reload(function(status) {
+    //   try {
+    //     expect(status).to.eql("success");
+    //   }
+    //   catch(e) { return reject(e); }
+    //   resolve();
+    // }
+    page.reload();
+    waitForInitiation().then(function(r) {
+      var html = page.evaluate(function() {
+        return $("#rootDiv").html();
       });
-      expect(html).to.contain("abc");
-      expect(upToDate).to.eql(true);
-    }, 10).then(resolve).catch(reject);
+      expect(html).to.eql('abc');
+      resolve();
+    }).catch(reject);
   });
 }
 
 
 visitEditPage()
 .then(editRootDiv)
+.then(refresh)
 .then(function() {
   phantom.exit();
 })
