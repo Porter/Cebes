@@ -7,11 +7,17 @@ class DocumentInstanceManager {
     this.openDocuments = {}
   }
 
+  reset() {
+    console.log('resetting');
+    this.openDocuments = {};
+  }
+
   openDocument(documentId) {
     const openDocuments = this.openDocuments;
     return new Promise(function(resolve, reject) {
       let editProcessor = openDocuments[documentId];
       if (editProcessor) {
+        console.log('already open', editProcessor.getDocument().text)
         return resolve(editProcessor.getDocument());
       }
       console.log("finding", {where: {id: documentId}});

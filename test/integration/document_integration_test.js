@@ -1,7 +1,8 @@
 const Promise = require("bluebird");
 const expect = require('chai').expect;
-const testHelper = require("./test_helper")
-const Document = require("../../models/document")
+const testHelper = require("./test_helper");
+const Document = require("../../models/document");
+const SocketIOHandler = require("../../helpers/socket_io_handler");
 
 const folder = "documents";
 
@@ -44,23 +45,18 @@ describe('User visits signup page @integration', () => {
 
     before(done => {
       Document.sync({force: true}).then(removedCount => {
+        SocketIOHandler.reset();
         testHelper.run(folder, "edit_view").then(done).catch(done);
       }).catch(done);
     });
 
-    it("should be accessable from the button at /documents", () => {
+    it("should be accessable from the button at /documents", () => {});
 
-    });
+    it("should be an id of 1", () => {});
 
-    it("should be an id of 1", () => {
+    it("should have a changable div with the id 'rootDiv'", () => {});
 
-    });
-
-    it("should have a changable div with the id 'rootDiv'", () => {
-    });
-
-    it("should have the changes even after a refresh", () => {
-    });
+    it("should have the changes even after a refresh", () => {});
 
     it("should update the document in the db", done => {
       waitForIt(() => {
@@ -76,4 +72,31 @@ describe('User visits signup page @integration', () => {
       }, 10).then(done).catch(done);
     });
   });
+
+  describe("Real time edits", () => {
+    it("should work", done => {
+      let doneCount = 0;
+      let tryToFinish = function() {
+        if (doneCount == 2) done();
+      };
+
+      testHelper.run(folder, "browser_1").then(r => {
+        doneCount++;
+        tryToFinish();
+      }).catch(e => {
+        console.log("browser 1 fails");
+        done(e);
+      });
+
+
+      testHelper.run(folder, "browser_2").then(r => {
+        doneCount++;
+        tryToFinish();
+      }).catch(e => {
+        console.log("browser 2 fails");
+        done(e);
+      });
+    });
+  });
+
 });

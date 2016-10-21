@@ -10,6 +10,10 @@ function setDivText(text) {
   div.innerHTML = text;
 }
 
+function getDiv() {
+  return div;
+}
+
 function init(doc) {
   div = document.getElementById("rootDiv");
   setDivText(doc.text);
@@ -48,5 +52,8 @@ module.exports = {
   watch: watch,
   init: init,
   isInited: isInited,
+  getDiv: getDiv,
+  setDivText: setDivText,
+  getDivText: getDivText,
   isUpToDate: isUpToDate
 };

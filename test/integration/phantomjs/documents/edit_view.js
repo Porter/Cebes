@@ -1,10 +1,11 @@
-var page = require('webpage').create();
+var webpage = require('webpage');
+var page = webpage.create();
 var expect = require("chai").expect;
 var Promise = require("bluebird");
 
-function waitForInitiation() {
+function waitForInitiation(phantomPage) {
   return waitForIt(function () {
-    var inited = page.evaluate(function() {
+    var inited = phantomPage.evaluate(function() {
       return frontEnd.isInited();
     });
     expect(inited).to.eql(true);
@@ -57,16 +58,15 @@ function visitEditPage() {
 
 function editRootDiv() {
   return new Promise(function(resolve, reject) {
-    waitForInitiation().then(function(r) {
-      page.evaluate(function() {
-        $("#rootDiv").focus();
-      });
-
+    waitForInitiation(page).then(function(r) {
       var html = page.evaluate(function() {
         return $("#rootDiv").html();
       });
       expect(html).to.eql('');
 
+      page.evaluate(function() {
+        $("#rootDiv").focus();
+      });
       page.sendEvent('keypress', 'abc');
 
       waitForIt(function () {
@@ -76,24 +76,21 @@ function editRootDiv() {
         var upToDate = page.evaluate(function() {
           return frontEnd.isUpToDate();
         });
+        var divText = page.evaluate(function() {
+          return frontEnd.getDivText();
+        });
         expect(html).to.contain("abc");
+        expect(divText).to.eql("abc");
         expect(upToDate).to.eql(true);
-      }, 10).then(resolve).catch(reject);
+      }, 30).then(resolve).catch(reject);
     }).catch(reject);
   });
 }
 
 function refresh() {
   return new Promise(function(resolve, reject) {
-    // page.reload(function(status) {
-    //   try {
-    //     expect(status).to.eql("success");
-    //   }
-    //   catch(e) { return reject(e); }
-    //   resolve();
-    // }
     page.reload();
-    waitForInitiation().then(function(r) {
+    waitForInitiation(page).then(function(r) {
       var html = page.evaluate(function() {
         return $("#rootDiv").html();
       });
@@ -104,11 +101,12 @@ function refresh() {
 }
 
 
+
 visitEditPage()
 .then(editRootDiv)
 .then(refresh)
 .then(function() {
-  phantom.exit();
+  setTimeout(phantom.exit, 2000);
 })
 .catch(function(e) {
   console.error(e);

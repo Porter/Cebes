@@ -9,6 +9,7 @@ function handle(io) {
 
     socket.on('init', documentId => {
       documentInstanceManager.openDocument(documentId).then(doc => {
+        socket.join(documentId);
         socket.emit('init', {
           text: doc.text
         });
@@ -21,8 +22,9 @@ function handle(io) {
       console.log("edit recieved");
       edit = new Edit(edit);
       console.log(edit);
+      socket.broadcast.to(edit.documentId).emit("edit", edit);
       documentInstanceManager.processEdit(edit).then(results => {
-        socket.emit("edit processed", edit.getNumber());
+        // socket.emit("edit processed", edit.getNumber());
       })
       .catch(err => {
         console.log(err);
@@ -31,6 +33,11 @@ function handle(io) {
   });
 }
 
+function reset() {
+  documentInstanceManager.reset();
+}
+
 module.exports = {
-  handle: handle
+  handle: handle,
+  reset: reset
 }
