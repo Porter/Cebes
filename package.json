@@ -10,9 +10,6 @@
     "start": "npm run start-dev",
     "start-dev": "NODE_ENV=development nodemon index.js",
     "start-test": "NODE_ENV=test PORT=9000 nodemon index.js",
-    "migrate": "node migrations/migration_manager.js",
-    "clean": "rm public/js/bundle.js",
-    "build": "browserify frontEnd/socket_io_handler.js --s frontEnd -o public/js/out.js && babel public/js/out.js --out-file public/js/bundle.js && rm public/js/out.js",
     "start-db": "sudo -u postgres postgres -D /usr/local/pgsql/data/"
   },
   "author": "Porter Haet",
@@ -36,8 +33,10 @@
   "devDependencies": {
     "babel-cli": "^6.16.0",
     "babel-preset-es2015": "^6.16.0",
+    "browserify": "^13.1.0",
     "chai": "^3.5.0",
     "chai-string": "^1.2.0",
+    "gulp": "^3.9.1",
     "mocha": "^3.0.1",
     "nodemon": "^1.10.0",
     "phantomjs": "^2.1.7",
