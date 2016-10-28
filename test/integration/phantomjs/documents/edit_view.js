@@ -6,7 +6,10 @@ var Promise = require("bluebird");
 function waitForInitiation(phantomPage) {
   return waitForIt(function () {
     var inited = phantomPage.evaluate(function() {
-      return frontEnd.isInited();
+      try {
+        return frontEnd.isInited();
+      }
+      catch(e) { return false; }
     });
     expect(inited).to.eql(true);
   });
