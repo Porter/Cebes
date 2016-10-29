@@ -3,11 +3,21 @@ const editHelper = require('../helpers/edit_helper');
 let text, lastSentText, div, inited = false;
 
 function getDivText() {
-  return div.textContent;
+  const childNodes = div.childNodes;
+  var text = '';
+  for (var i = 0; i < childNodes.length; i++) {
+    text += childNodes[i].textContent + '\n';
+  }
+  return text;
 }
 
 function setDivText(text) {
-  div.innerHTML = text;
+  var t = '';
+  const texts = text.split('\n');
+  texts.forEach(text => {
+    t += "<div>" + text + "</div>";
+  });
+  div.innerHTML = t;
 }
 
 function getDiv() {
@@ -55,5 +65,6 @@ module.exports = {
   getDiv: getDiv,
   setDivText: setDivText,
   getDivText: getDivText,
-  isUpToDate: isUpToDate
+  isUpToDate: isUpToDate,
+  testing: require("./testing")
 };

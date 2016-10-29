@@ -4,11 +4,21 @@ const editHelper = require('../helpers/edit_helper');
 let text, lastSentText, div, inited = false;
 
 function getDivText() {
-  return div.textContent;
+  const childNodes = div.childNodes;
+  var text = '';
+  for (var i = 0; i < childNodes.length; i++) {
+    text += childNodes[i].textContent + '\n';
+  }
+  return text;
 }
 
 function setDivText(text) {
-  div.innerHTML = text;
+  var t = '';
+  const texts = text.split('\n');
+  texts.forEach(text => {
+    t += "<div>" + text + "</div>";
+  });
+  div.innerHTML = t;
 }
 
 function getDiv() {
@@ -56,10 +66,11 @@ module.exports = {
   getDiv: getDiv,
   setDivText: setDivText,
   getDivText: getDivText,
-  isUpToDate: isUpToDate
+  isUpToDate: isUpToDate,
+  testing: require("./testing")
 };
 
-},{"../helpers/edit_helper":5}],2:[function(require,module,exports){
+},{"../helpers/edit_helper":6,"./testing":5}],2:[function(require,module,exports){
 const Promise = require("bluebird");
 
 class FrontEndDocument {
@@ -79,7 +90,7 @@ class FrontEndDocument {
 
 module.exports = FrontEndDocument;
 
-},{"bluebird":8}],3:[function(require,module,exports){
+},{"bluebird":9}],3:[function(require,module,exports){
 var queryParams = (function(a) {
     if (a == "") return {};
     var b = {};
@@ -156,7 +167,29 @@ myEmitter.on('text diff', diff => {
 
 module.exports = divWatcher;
 
-},{"../helpers/edit_processor":6,"../models/edit":7,"./div_watcher":1,"./front_end_document":2,"./query_params":3,"events":9,"lodash":10}],5:[function(require,module,exports){
+},{"../helpers/edit_processor":7,"../models/edit":8,"./div_watcher":1,"./front_end_document":2,"./query_params":3,"events":10,"lodash":11}],5:[function(require,module,exports){
+const editHelper = require('../helpers/edit_helper');
+
+function getRandomInsertion(text) {
+  var pos = Math.floor(Math.random() * (text.length + 1));
+  var char = String.fromCharCode(97 + Math.floor(Math.random() * 26));
+  if (Math.random() < .25) { char = '\n'; }
+  return [ {i: pos, val: char} ];
+}
+
+function applyRandomInsertion() {
+  const oldText = frontEnd.getDivText();
+  const insertion = getRandomInsertion(oldText);
+  const newText = editHelper.applyTextDiff(oldText, insertion);
+
+  frontEnd.setDivText(newText);
+}
+
+module.exports = {
+  applyRandomInsertion: applyRandomInsertion
+};
+
+},{"../helpers/edit_helper":6}],6:[function(require,module,exports){
 module.exports = {
   textDiff: textDiff,
   applyTextDiff: applyTextDiff
@@ -282,7 +315,7 @@ function applyTextDiff(text, diff) {
   return text;
 }
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 (function (process){
 const editHelper = require("./edit_helper");
 
@@ -308,7 +341,7 @@ class EditProcessor {
 module.exports = EditProcessor;
 
 }).call(this,require('_process'))
-},{"./edit_helper":5,"_process":11}],7:[function(require,module,exports){
+},{"./edit_helper":6,"_process":12}],8:[function(require,module,exports){
 class Edit {
   constructor(options) {
     this.diff = options.diff;
@@ -325,7 +358,7 @@ class Edit {
 
 module.exports = Edit;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 (function (process,global){
 /* @preserve
  * The MIT License (MIT)
@@ -5926,7 +5959,7 @@ module.exports = ret;
 },{"./es5":13}]},{},[4])(4)
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":11}],9:[function(require,module,exports){
+},{"_process":12}],10:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -6230,7 +6263,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -23196,7 +23229,7 @@ function isUndefined(arg) {
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
